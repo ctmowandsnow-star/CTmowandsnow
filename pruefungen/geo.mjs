@@ -65,7 +65,7 @@ function ldBloecke(h) {
 }
 
 /** Alle Regeln fuer EINE Seite. Liefert die Liste der Verstoesse. */
-export function pruefeSeite(html, { entwurf = IST_ENTWURF } = {}) {
+export function pruefeSeite(html, { entwurf = IST_ENTWURF, telefon = TELEFON, inhaber = INHABER } = {}) {
   const fehler = [];
   const t = titelVon(html);
   if (t.length < TITEL_MIN || t.length > TITEL_MAX) fehler.push(`Titel ${t.length} Zeichen (${TITEL_MIN}-${TITEL_MAX}): "${t}"`);
@@ -83,12 +83,12 @@ export function pruefeSeite(html, { entwurf = IST_ENTWURF } = {}) {
     const unbekannt = typen.filter((x) => !GUELTIGE_FIRMENTYPEN.has(x));
     if (unbekannt.length) fehler.push(`Firmentyp nicht in schema.org: ${unbekannt.join(', ')}`);
     if (!f.name || !f.url || !Array.isArray(f.areaServed) || !f.areaServed.length) fehler.push('Firmendatensatz ohne name/url/areaServed');
-    if (!offen(TELEFON) && f.telephone !== TELEFON) fehler.push(`telephone im Schema "${f.telephone}" statt "${TELEFON}"`);
+    if (!offen(telefon) && f.telephone !== telefon) fehler.push(`telephone im Schema "${f.telephone}" statt "${telefon}"`);
     const person = f.employee || f.founder;
-    if (!offen(INHABER) && person?.name !== INHABER) fehler.push(`Inhaber "${INHABER}" fehlt als Person im Schema`);
+    if (!offen(inhaber) && person?.name !== inhaber) fehler.push(`Inhaber "${inhaber}" fehlt als Person im Schema`);
   }
   // Ein Platzhaltername darf NIE zur Person im Schema werden.
-  if (offen(INHABER) && JSON.stringify(gueltig).includes('"Person"')) fehler.push('Person im Schema, obwohl kein echter Inhabername eingetragen ist');
+  if (offen(inhaber) && JSON.stringify(gueltig).includes('"Person"')) fehler.push('Person im Schema, obwohl kein echter Inhabername eingetragen ist');
 
   const seiten = gueltig.filter((b) => SEITENTYPEN.has(b['@type']));
   if (seiten.length !== 1) fehler.push(`${seiten.length} Seitenknoten (erwartet genau 1)`);
@@ -186,8 +186,19 @@ if (IST_ENTWURF) {
     ['kein rel=author', sauber.replace(/<link rel="author"[^>]*>/, ''), 1],
     ['noindex auf einer Live-Seite', sauber.replace('<head>', '<head><meta name="robots" content="noindex, nofollow"/>'), 1],
   ];
-  for (const [name, html, soll] of faelle) {
-    const ist = pruefeSeite(html, { entwurf: false });
+  // Feste, neutrale Konfiguration: sonst haengt "sauber" davon ab, ob in
+  // business.ts gerade Telefon und Inhaber stehen. Im Live-Probelauf vom
+  // 26.09. wurde das saubere Beispiel genau deshalb rot.
+  const neutral = { entwurf: false, telefon: '', inhaber: '' };
+  const mitPerson = sauber.replace('"name":"X"', '"name":"X","employee":{"@type":"Person","name":"Jane Doe"}');
+  faelle.push(
+    ['Inhaber eingetragen, aber keine Person im Schema', sauber, 1, { inhaber: 'Jane Doe' }],
+    ['Telefon eingetragen, aber nicht im Schema', sauber, 1, { telefon: '+18605550100' }],
+    ['Person im Schema ohne echten Inhabernamen', mitPerson, 1, {}],
+    ['Inhaber eingetragen und als Person im Schema', mitPerson, 0, { inhaber: 'Jane Doe' }],
+  );
+  for (const [name, html, soll, konfig = {}] of faelle) {
+    const ist = pruefeSeite(html, { ...neutral, ...konfig });
     melde(soll === 0 ? ist.length === 0 : ist.length >= soll,
       `Gegenprobe "${name}": ${ist.length} Verstoss/Verstoesse${ist.length ? ` (${ist[0]})` : ''}`);
   }
