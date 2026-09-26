@@ -103,6 +103,9 @@ export function BusinessLD() {
     },
   };
 
+  // Offizieller Name wie im Google-Profil - der Anzeigename bleibt die Marke.
+  if (BUSINESS.legalName) data.legalName = BUSINESS.legalName;
+
   // Kontaktweg nur, wenn es ihn wirklich gibt.
   if (BUSINESS.contact.phone) data.telephone = BUSINESS.contact.phone;
   if (BUSINESS.contact.email) data.email = BUSINESS.contact.email;

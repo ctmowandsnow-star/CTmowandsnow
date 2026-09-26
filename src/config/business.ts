@@ -18,9 +18,15 @@
 export const BUSINESS = {
   /** Vom Betrieb selbst geliefert (22.09.2026). */
   name: 'CT Mow&Snow',
+  /** Offizieller Firmenname - so traegt er ihn auch bei Google ein (WhatsApp an Niclas, 26.09.2026). */
+  legalName: 'CT Mow & Snow LLC',
   /** Kurzform fuers Logo auf schmalen Bildschirmen. */
   shortName: 'CT Mow&Snow',
-  /** PLATZHALTER - Name des Inhabers fehlt noch. */
+  /**
+   * PLATZHALTER - Name des Inhabers fehlt noch. Optional: ohne echten Namen
+   * gibt es keine Person im Schema und keine Inhaberzeile - die Seite darf
+   * trotzdem live gehen (Entscheidung 26.09.2026).
+   */
   ownerName: 'Owner name pending',
   /** Seine eigene Ueberschrift. */
   tagline: 'Reliable Lawn Care & Snow Removal in Central Connecticut',
@@ -31,15 +37,21 @@ export const BUSINESS = {
   url: 'https://ctmowandsnowllc.com',
 
   contact: {
-    /** PLATZHALTER. Ein Telefonlink mit falscher Nummer ist schlimmer als keiner. */
-    phone: '',
-    phoneDisplay: '',
-    email: '',
-    /** Wo der Betrieb wirklich sitzt. Ohne diese Angabe kein Adress-Schema. */
+    /** Vom Inhaber selbst (WhatsApp an Niclas, 26.09.2026). */
+    phone: '+18605059131',
+    phoneDisplay: '860-505-9131',
+    /** Geschaeftskonto des Betriebs (auch Vercel-Login). Empfaengt die Formularanfragen. */
+    email: 'ctmowandsnow@gmail.com',
+    /**
+     * Die Strasse ist bekannt, wird aber bewusst NICHT veroeffentlicht: Es ist
+     * die Wohnadresse, der Betrieb faehrt zum Kunden (Service-Area-Business),
+     * und im Google-Profil wird die Adresse ebenfalls verborgen. Ort und PLZ
+     * reichen fuer die Suche. Ohne Strasse entsteht kein PostalAddress-Schema.
+     */
     street: '',
-    city: '',
+    city: 'Plainville',
     state: 'Connecticut',
-    zip: '',
+    zip: '06062',
     country: 'US',
     /** Fuer LocalBusiness geo - nur setzen, wenn wirklich bekannt. */
     lat: null as number | null,
@@ -97,7 +109,6 @@ export const BUSINESS = {
  */
 export const PFLICHTFELDER: { feld: string; wert: string }[] = [
   { feld: 'business name', wert: BUSINESS.name },
-  { feld: 'owner', wert: BUSINESS.ownerName },
   { feld: 'domain', wert: BUSINESS.url },
   { feld: 'phone', wert: BUSINESS.contact.phone },
   { feld: 'email', wert: BUSINESS.contact.email },

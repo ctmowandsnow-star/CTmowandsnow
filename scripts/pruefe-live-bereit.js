@@ -4,7 +4,8 @@
  * Solange in src/config/business.ts `istEntwurf: true` steht, tut sie nichts.
  * Steht dort `false`, muss die Seite wirklich live-faehig sein, sonst bricht
  * der Bau ab und Vercel stellt nichts Neues aus:
- *   - Inhaber, Domain, Telefon, E-Mail und Ort sind keine Platzhalter mehr
+ *   - Domain, Telefon, E-Mail und Ort sind keine Platzhalter mehr (der
+ *     Inhabername ist seit 26.09.2026 optional)
  *   - auf der Produktionsumgebung von Vercel ist RESEND_API_KEY gesetzt,
  *     damit das Formular nicht ins Leere laeuft
  *
@@ -42,7 +43,6 @@ if (entwurf === 'true') {
 const offen = (w) => !w.trim() || /platzhalter|pending|example-/i.test(w);
 
 const pflicht = {
-  'ownerName (owner)': feld(/^\s*ownerName:\s*'([^']*)'/m, 'ownerName'),
   'url (domain)': feld(/^\s*url:\s*'([^']*)'/m, 'url'),
   'contact.phone': feld(/^\s*phone:\s*'([^']*)'/m, 'phone'),
   'contact.email': feld(/^\s*email:\s*'([^']*)'/m, 'email'),
