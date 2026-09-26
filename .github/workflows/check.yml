@@ -1,0 +1,22 @@
+# Baut die Seite und faehrt alle Pruefstaende ohne Browser - bei jedem Pull
+# Request und jedem Push auf main. Ein roter Lauf heisst: nicht mergen.
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run check

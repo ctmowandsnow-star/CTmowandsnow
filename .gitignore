@@ -1,0 +1,28 @@
+# Abhaengigkeiten und Bauergebnisse
+node_modules/
+.next/
+.next-*/
+out/
+out-static/
+next-env.d.ts
+tsconfig.tsbuildinfo
+.vercel/
+
+# Formularanfragen (Personendaten) und Geheimnisse
+data/
+.env*
+
+# Pruefstaende
+.mutation-sicherung/
+*.log
+
+# Nur fuer den Entwicklungsserver, auf dem die Seite entstanden ist
+# (Vorschau hinter einem Proxy, interne Uebergabenotizen) - gehoert nicht ins Repo.
+STAND.md
+HINWEIS-ZEUS-PARALLEL.md
+pruefungen/vorschau-wacht.sh
+pruefungen/vorschau.mjs
+scripts/vorschau-export.mjs
+
+# Wird bei jedem Bau erzeugt (scripts/generate-llms-txt.js)
+public/llms.txt

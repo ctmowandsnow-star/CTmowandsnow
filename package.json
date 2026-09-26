@@ -1,0 +1,35 @@
+{
+  "name": "us-landscaping-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1 -p 3210",
+    "build": "next build",
+    "start": "next start -H 127.0.0.1 -p 3210",
+    "lint": "next lint",
+    "prebuild": "node scripts/generate-llms-txt.js && node scripts/pruefe-live-bereit.js",
+    "vorschau": "next start -H 0.0.0.0 -p 3210",
+    "proxy": "NEXT_BASE_PATH=/ct NEXT_PUBLIC_BASIS_PFAD=/ct next start -H 127.0.0.1 -p 3210",
+    "proxy-build": "NEXT_BASE_PATH=/ct NEXT_PUBLIC_BASIS_PFAD=/ct next build",
+    "check": "node pruefungen/alle.mjs"
+  },
+  "dependencies": {
+    "framer-motion": "^11.18.2",
+    "lucide-react": "^0.468.0",
+    "next": "15.5.25",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2"
+  }
+}

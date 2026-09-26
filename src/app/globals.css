@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Hoehe des Entwurfsbandes an EINER Stelle. Band, Header und der
+       Seitenabstand lesen denselben Wert - sonst laufen sie auseinander,
+       und genau das hat der erste Screenshot gezeigt. */
+    --draft-h: 0px;
+
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-display: ui-serif, Georgia, Cambria, 'Times New Roman', serif;
+
+    /* Die Akzentfarbe wird von der Saison gesetzt (siehe SeasonProvider).
+       Eine Variable statt zweier Klassensaetze: so animiert der Wechsel
+       ueber die ganze Seite, statt Bausteine einzeln umzuschalten. */
+    --accent: 82 138 61;        /* moss-500 */
+    --accent-soft: 155 197 136; /* moss-300 */
+    --accent-deep: 35 59 30;    /* moss-900 */
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    @apply bg-bark-950 text-bark-100 antialiased;
+    font-family: var(--font-sans);
+    padding-top: var(--draft-h);
+  }
+
+
+  ::selection { background: rgb(var(--accent) / .35); }
+
+  /* Wer Bewegung abgestellt hat, bekommt keine. Das ist keine Kuer:
+     auf einer Seite mit Video-Hintergrund und Scroll-Effekten ist das
+     der Unterschied zwischen benutzbar und uebel. */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .accent-text { color: rgb(var(--accent-soft)); }
+  .accent-bg { background-color: rgb(var(--accent)); }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3
+           text-sm font-semibold tracking-wide transition-all duration-300;
+  }
+  .btn-primary {
+    background-color: rgb(var(--accent));
+    @apply text-white shadow-lg hover:brightness-110 hover:shadow-xl active:scale-[.98];
+  }
+  .btn-ghost {
+    @apply border border-white/20 bg-white/5 text-white backdrop-blur
+           hover:border-white/40 hover:bg-white/10 active:scale-[.98];
+  }
+
+  .wrap { @apply mx-auto w-full max-w-6xl px-5 sm:px-8; }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[.18em];
+    color: rgb(var(--accent-soft));
+  }
+
+  .card {
+    @apply rounded-2xl border border-white/10 bg-white/[.04] backdrop-blur-sm
+           transition-all duration-300 hover:border-white/25 hover:bg-white/[.07];
+  }
+
+  /* Schriftgroesse in Eingabefeldern: unter 16px zoomt Safari beim Antippen
+     automatisch in die Seite und das Layout springt. Gelernt am 20.09. */
+  .field {
+    @apply w-full rounded-xl border border-white/15 bg-white/[.05] px-4 py-3
+           text-base text-white placeholder:text-bark-400
+           focus:border-white/40 focus:outline-none focus:ring-2;
+    font-size: 16px;
+  }
+  .field:focus { --tw-ring-color: rgb(var(--accent) / .45); }
+}
