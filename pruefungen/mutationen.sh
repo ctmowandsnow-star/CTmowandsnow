@@ -54,11 +54,48 @@ fi
 
 cp -r src "$SICHERUNG"
 
+# Stellt src aus der Sicherung wieder her - aber NUR, wenn es sie gibt.
+#
+# WARUM (26.09.2026, echter Vorfall im Probeklon): Der Lauf bekam mitten in
+# Mutation 6 ein SIGTERM. Der Trap stellte src wieder her und loeschte die
+# Sicherung - lief danach aber WEITER, weil ein Trap das Skript nicht
+# beendet. Jede folgende Mutation machte `rm -rf src && cp -r SICHERUNG src`:
+# rm gelang, cp nicht. src war weg, jeder Bau scheiterte, und das Skript
+# meldete "9 von 9 Mutationen bemerkt". Im Projektordner selbst haette
+# derselbe Ablauf den Quelltext geloescht.
+zurueck() {
+  if [ ! -d "$SICHERUNG" ]; then
+    echo "ABBRUCH: Sicherung $SICHERUNG fehlt - src wird NICHT angefasst."
+    exit 3
+  fi
+  rm -rf src && cp -r "$SICHERUNG" src
+}
+
 aufraeumen() {
+  [ -d "$SICHERUNG" ] || return 0
   rm -rf src && cp -r "$SICHERUNG" src && rm -rf "$SICHERUNG"
   echo "  (Quelltext wiederhergestellt)"
 }
-trap aufraeumen EXIT INT TERM
+trap aufraeumen EXIT
+trap 'aufraeumen; exit 130' INT
+trap 'aufraeumen; exit 143' TERM
+
+# Wurde die Mutation ueberhaupt angewendet? Ein Ersatz, dessen Anker fehlt,
+# aendert nichts - dann darf weder ein roter Durchstich noch ein
+# Bauabbruch als "bemerkt" zaehlen.
+angewendet() {
+  local name="$1" d
+  diff -rq src "$SICHERUNG" > /dev/null 2>&1; d=$?
+  if [ "$d" -eq 0 ]; then
+    echo "ROT  $name: Mutation wurde gar nicht angewendet (Anker fehlt?)"
+    rot=$((rot+1)); return 1
+  fi
+  if [ "$d" -ne 1 ]; then
+    echo "ABBRUCH: $name - src oder Sicherung unvollstaendig."
+    exit 3
+  fi
+  return 0
+}
 
 neustart() {
   local pid
@@ -75,6 +112,7 @@ neustart() {
 
 pruefe() {
   local name="$1"
+  angewendet "$name" || { zurueck; return; }
   if npm run build > /tmp/mutation-build.log 2>&1 && neustart; then
     if node pruefungen/durchstich.mjs > /tmp/mutation-lauf.log 2>&1; then
       echo "ROT  $name: Durchstich blieb GRUEN, obwohl der Fehler drin ist"
@@ -90,7 +128,7 @@ pruefe() {
     echo " ok  $name: schon der Bau bricht ab (Fehler wird ebenfalls bemerkt)"
     gruen=$((gruen+1))
   fi
-  rm -rf src && cp -r "$SICHERUNG" src
+  zurueck
 }
 
 echo "== Mutation 1: Adresse trotz Entwurfsstand ins Schema =="
@@ -204,7 +242,9 @@ t=t.replace('{t.merkmale[k]}', '{\\'Every property is different, and we treat it
 t=t.replace('{t.character}', '{\\'We work across the whole area.\\'}')
 open(p,'w').write(t)
 "
-if npm run build > /tmp/mutation-build.log 2>&1 && neustart; then
+if ! angewendet "Kombiseiten ohne Ortsbezug"; then
+  :
+elif npm run build > /tmp/mutation-build.log 2>&1 && neustart; then
   if node pruefungen/doorway.mjs > /tmp/mutation-doorway.log 2>&1; then
     echo "ROT  Kombiseiten ohne Ortsbezug: doorway.mjs blieb GRUEN"
     rot=$((rot+1))
@@ -217,7 +257,7 @@ else
   echo " ok  Kombiseiten ohne Ortsbezug: schon der Bau bricht ab"
   gruen=$((gruen+1))
 fi
-rm -rf src && cp -r "$SICHERUNG" src
+zurueck
 
 echo
 echo "$gruen von $((gruen+rot)) Mutationen wurden bemerkt."
