@@ -7,11 +7,11 @@ import { Cta } from '@/components/site/Cta';
 import { Reveal } from '@/components/ui/Reveal';
 import { BeforeAfter } from '@/components/ui/BeforeAfter';
 import { Faq } from '@/components/ui/Faq';
-import { FaqLD } from '@/components/seo/JsonLd';
+import { FaqLD, SeiteLD } from '@/components/seo/JsonLd';
+import { START_BESCHREIBUNG, START_TITEL } from '@/lib/seo';
 import { PAIRS } from '@/config/gallery';
 import { ARBEITSWEISEN } from '@/config/arbeitsweisen';
 import { REGION, STATE_CODE, TOWN_COUNT, TOWNS, UMLAND_HINWEIS } from '@/config/towns';
-import { BUSINESS } from '@/config/business';
 import { bild } from '@/lib/pfad';
 
 /**
@@ -60,6 +60,7 @@ const PROOF = [
 export default function HomePage() {
   return (
     <>
+      <SeiteLD pfad="/" name={START_TITEL} beschreibung={START_BESCHREIBUNG} />
       <FaqLD id="home" faq={HOME_FAQ} />
       <Hero />
 
@@ -238,9 +239,11 @@ export default function HomePage() {
 
       <Cta
         head={`Get a free estimate for your property`}
+        // Hier stand bis 26.09.2026 "(Phone number goes here once it is set.)" -
+        // sichtbar fuer jeden Besucher, obwohl das Entwurfsband schon weg war.
+        // Eine fehlende Nummer wird einfach nicht gezeigt (Cta blendet sie aus).
         sub={`Tell us the address and what you are looking for. We will look at the property and come back `
-          + `with a number — no charge, and nothing owed if you pass.${
-            BUSINESS.contact.phone ? '' : ' (Phone number goes here once it is set.)'}`}
+          + `with a number — no charge, and nothing owed if you pass.`}
       />
     </>
   );

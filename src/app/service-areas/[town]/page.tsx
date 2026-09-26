@@ -20,7 +20,7 @@ import { Cta } from '@/components/site/Cta';
 import { Crumbs } from '@/components/site/Crumbs';
 import { BreadcrumbLD, FaqLD, ServiceLD, TownPageLD } from '@/components/seo/JsonLd';
 import { BUSINESS } from '@/config/business';
-import { canonical, ROBOTS } from '@/lib/seo';
+import { beschreibung, canonical, ROBOTS, titel } from '@/lib/seo';
 import { bild } from '@/lib/pfad';
 
 export function generateStaticParams() {
@@ -34,10 +34,13 @@ export async function generateMetadata(
   const t = townBySlug.get(slug);
   if (!t) return {};
   return {
-    title: { absolute: `Lawn Care & Snow Removal in ${t.name}, ${t.stateCode} — ${BUSINESS.name}` },
-    description:
+    title: titel(`Lawn Care & Snow Removal in ${t.name}, ${t.stateCode}`),
+    description: beschreibung(
       `Lawn mowing, mulch, cleanups and bush work in ${t.name}, ${t.stateCode} — plus driveway plowing, `
-      + `walkway clearing and ice control all winter. Free estimates.`,
+        + `walkway clearing and ice control all winter. Free estimates.`,
+      `Lawn care and snow removal in ${t.name}, ${t.stateCode}: mowing, mulch and cleanups, then plowing `
+        + `and ice control all winter.`,
+    ),
     robots: ROBOTS,
     alternates: canonical(`/service-areas/${t.slug}`),
   };

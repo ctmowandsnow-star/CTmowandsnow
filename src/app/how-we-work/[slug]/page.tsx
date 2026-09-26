@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { Verweis as Link } from '@/components/ui/Verweis';
 import { notFound } from 'next/navigation';
 import { ArrowRight, Check, MapPin, X } from 'lucide-react';
-import { ARBEITSWEISEN, arbeitsweiseBySlug } from '@/config/arbeitsweisen';
+import { ARBEITSWEISEN, arbeitsweiseBySlug, type Arbeitsweise } from '@/config/arbeitsweisen';
 import { SERVICES, GREEN_SERVICES, SNOW_SERVICES } from '@/config/services';
 import { TOWNS, REGION } from '@/config/towns';
 import { BUSINESS } from '@/config/business';
@@ -11,8 +11,8 @@ import { Reveal } from '@/components/ui/Reveal';
 import { Faq } from '@/components/ui/Faq';
 import { Crumbs } from '@/components/site/Crumbs';
 import { Cta } from '@/components/site/Cta';
-import { BreadcrumbLD, FaqLD } from '@/components/seo/JsonLd';
-import { canonical, ROBOTS } from '@/lib/seo';
+import { BreadcrumbLD, FaqLD, SeiteLD } from '@/components/seo/JsonLd';
+import { beschreibung, canonical, ORTE_KURZ, ROBOTS, titel } from '@/lib/seo';
 import { bild } from '@/lib/pfad';
 
 export const dynamicParams = false;
@@ -20,13 +20,27 @@ export function generateStaticParams() {
   return ARBEITSWEISEN.map((a) => ({ slug: a.slug }));
 }
 
+function texte(a: Arbeitsweise) {
+  const ersterSatz = `${a.answer.split('. ')[0]}.`;
+  return {
+    titel: a.name,
+    beschreibung: beschreibung(
+      `${ersterSatz} Across ${REGION} — ${TOWNS.map((t) => t.name).slice(0, 4).join(', ')} and surrounding areas.`,
+      `${ersterSatz} Serving ${ORTE_KURZ} and nearby towns.`,
+      `${ersterSatz} Free estimates.`,
+      `${a.summary} Free estimates across ${REGION}.`,
+    ),
+  };
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const a = arbeitsweiseBySlug.get(slug);
   if (!a) return {};
+  const t = texte(a);
   return {
-    title: a.name,
-    description: `${a.answer.split('. ')[0]}. Across ${REGION} — ${TOWNS.map((t) => t.name).slice(0, 4).join(', ')} and surrounding areas.`,
+    title: titel(t.titel),
+    description: t.beschreibung,
     robots: ROBOTS,
     alternates: canonical(`/how-we-work/${a.slug}`),
     openGraph: {
@@ -51,8 +65,11 @@ export default async function ArbeitsweiseSeite({ params }: { params: Promise<{ 
     { name: a.name, path: `/how-we-work/${a.slug}` },
   ];
 
+  const text = texte(a);
+
   return (
     <>
+      <SeiteLD pfad={`/how-we-work/${a.slug}`} name={text.titel} beschreibung={text.beschreibung} />
       <FaqLD id={`arbeitsweise-${a.slug}`} faq={a.faq} />
       <BreadcrumbLD trail={spur} />
 

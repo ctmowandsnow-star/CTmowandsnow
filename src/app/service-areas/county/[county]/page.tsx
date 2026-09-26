@@ -3,15 +3,15 @@ import Image from 'next/image';
 import { Verweis as Link } from '@/components/ui/Verweis';
 import { notFound } from 'next/navigation';
 import { ArrowRight, MapPin } from 'lucide-react';
-import { COUNTIES, countyBySlug, townsInCounty, neighborsOf, REGION, UMLAND_HINWEIS } from '@/config/towns';
+import { COUNTIES, countyBySlug, townsInCounty, neighborsOf, REGION, UMLAND_HINWEIS, type County } from '@/config/towns';
 import { GREEN_SERVICES, SNOW_SERVICES } from '@/config/services';
 import { BUSINESS } from '@/config/business';
 import { Reveal } from '@/components/ui/Reveal';
 import { Faq } from '@/components/ui/Faq';
 import { Crumbs } from '@/components/site/Crumbs';
 import { Cta } from '@/components/site/Cta';
-import { BreadcrumbLD, FaqLD } from '@/components/seo/JsonLd';
-import { canonical, ROBOTS } from '@/lib/seo';
+import { BreadcrumbLD, FaqLD, SeiteLD } from '@/components/seo/JsonLd';
+import { beschreibung, canonical, ROBOTS, titel } from '@/lib/seo';
 import { bild } from '@/lib/pfad';
 
 /**
@@ -27,6 +27,20 @@ export function generateStaticParams() {
   return COUNTIES.map((c) => ({ county: c.slug }));
 }
 
+function countyTitel(c: County) {
+  return `Lawn Care & Snow Removal in ${c.name}, ${c.stateCode}`;
+}
+
+function countyBeschreibung(c: County) {
+  const orte = townsInCounty(c);
+  return beschreibung(
+    `${orte.length} towns across ${c.name}: ${orte.map((t) => t.name).join(', ')}. `
+      + `Mowing, mulch and cleanups through the green season, plowing and ice control all winter.`,
+    `Lawn care and snow removal in ${orte.length} towns across ${c.name}: ${orte.map((t) => t.name).join(', ')}.`,
+    `Lawn care and snow removal in ${orte.length} towns across ${c.name}, ${c.stateCode}.`,
+  );
+}
+
 export async function generateMetadata(
   { params }: { params: Promise<{ county: string }> },
 ): Promise<Metadata> {
@@ -35,10 +49,8 @@ export async function generateMetadata(
   if (!c) return {};
   const orte = townsInCounty(c);
   return {
-    title: { absolute: `Lawn Care & Snow Removal in ${c.name}, ${c.stateCode} — ${BUSINESS.name}` },
-    description:
-      `${orte.length} towns across ${c.name}: ${orte.map((t) => t.name).join(', ')}. `
-      + `Mowing, mulch and cleanups through the green season, plowing and ice control all winter.`,
+    title: titel(countyTitel(c)),
+    description: countyBeschreibung(c),
     robots: ROBOTS,
     alternates: canonical(`/service-areas/county/${c.slug}`),
   };
@@ -76,6 +88,12 @@ export default async function CountySeite({ params }: { params: Promise<{ county
 
   return (
     <>
+      <SeiteLD
+        typ="CollectionPage"
+        pfad={`/service-areas/county/${c.slug}`}
+        name={countyTitel(c)}
+        beschreibung={countyBeschreibung(c)}
+      />
       <FaqLD id={`county-${c.slug}`} faq={faq} />
       <BreadcrumbLD trail={spur} />
 

@@ -42,6 +42,17 @@ on every build by `scripts/generate-llms-txt.js` — never edit it by hand.
    never in a single page.
 7. **No secrets in the repo.** Keys live in Vercel → Settings → Environment
    Variables.
+8. **Keep it readable for AI search (GEO).** `pruefungen/geo.mjs` checks every
+   page in the sitemap:
+   - Title 25–60 characters, description 70–160. Use `titel()` and
+     `beschreibung()` from `src/lib/seo.ts`; they keep to the limits.
+   - The business schema type must exist on schema.org. It is
+     `HomeAndConstructionBusiness`. There is no `LandscapingBusiness` type, and
+     an unknown type means "no business profile" to validators and AI systems.
+   - Every page has exactly one page node (`SeiteLD` in
+     `src/components/seo/JsonLd.tsx`) with `author`/`publisher`.
+   - No placeholder text may be visible ("goes here", "not set yet", …).
+     Missing contact data is simply not shown.
 
 ## Before every commit
 
@@ -52,8 +63,8 @@ npm run check     # starts the built site locally and runs all checks
 ```
 
 `npm run build` also fails on an incomplete go-live (see below).
-`npm run check` runs durchstich, links, doorway, behauptungen and
-tailwind-klassen against the built site — everything must be green before you
+`npm run check` runs durchstich, links, doorway, behauptungen,
+tailwind-klassen and geo against the built site — everything must be green before you
 push. The same runs as a GitHub Action on every pull request.
 
 ## Workflow
@@ -80,7 +91,10 @@ Going live:
    `src/app/api/quote/route.ts`. Without it the form tells visitors honestly
    that nobody was notified.
 3. Set `istEntwurf: false`. `scripts/pruefe-live-bereit.js` blocks the
-   production build if step 1 or 2 is missing.
+   production build if step 1 or 2 is missing. Opening hours stay hidden on
+   the live site until the owner confirms them (`hours.bestaetigt: true`).
+   The owner's name appears on /about and as a Person in the schema as soon as
+   `ownerName` is a real name.
 4. `pruefungen/durchstich.mjs` contains draft-only assertions (robots
    `Disallow`, `noindex`, `DRAFT` in llms.txt, no address schema). Flip them
    in the same pull request.

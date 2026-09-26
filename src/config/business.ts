@@ -58,6 +58,15 @@ export const BUSINESS = {
     regular: 'Mon-Sat, 7am-6pm',
     /** Im Winter richtet sich die Arbeit nach dem Wetter, nicht nach der Uhr. */
     stormNote: 'During a storm we run around the clock until every route is clear.',
+    /**
+     * UNBESTAETIGT (26.09.2026): Beide Saetze stehen NICHT in dem Text, den der
+     * Betrieb am 22.09. geliefert hat - sie stammen aus dem ersten Entwurf.
+     * Solange false, erscheinen sie nur im Entwurf. Beim Scharfschalten
+     * verschwinden sie von selbst (ZEITEN_SICHTBAR), damit Google und die
+     * KI-Systeme keine geratenen Zeiten als Tatsache uebernehmen. Bestaetigt
+     * der Inhaber sie, hier true setzen - dann gehen sie auch ins Schema.
+     */
+    bestaetigt: false,
   },
 
   /**
@@ -102,6 +111,12 @@ export function istOffen(wert: string): boolean {
 }
 
 export const OFFENE_FELDER = PFLICHTFELDER.filter((f) => istOffen(f.wert));
+
+/** Echter Inhabername eingetragen -> Person im Schema, Zeile auf /about, Feld in llms.txt. */
+export const HAT_INHABER = !istOffen(BUSINESS.ownerName);
+
+/** Oeffnungszeiten nur, wenn bestaetigt. Im Entwurf bleiben sie zur Ansicht stehen. */
+export const ZEITEN_SICHTBAR: boolean = BUSINESS.hours.bestaetigt || BUSINESS.istEntwurf;
 
 /** Nur wahr, wenn eine vollstaendige Postanschrift vorliegt. */
 export const HAT_ADRESSE =

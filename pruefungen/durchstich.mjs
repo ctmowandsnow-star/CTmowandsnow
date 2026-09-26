@@ -116,8 +116,8 @@ function ldBloecke(html) {
 }
 const ldStart = ldBloecke(start.text);
 melde(ldStart.every(Boolean), `Alle ${ldStart.length} JSON-LD-Bloecke der Startseite sind gueltiges JSON`);
-const geschaeft = ldStart.find((d) => d && d['@type'] === 'LandscapingBusiness');
-melde(!!geschaeft, 'LandscapingBusiness-Datensatz vorhanden');
+const geschaeft = ldStart.find((d) => d && d['@type'] === 'HomeAndConstructionBusiness');
+melde(!!geschaeft, 'Firmendatensatz (HomeAndConstructionBusiness) vorhanden');
 /** Ortsseiten: genau EIN Segment unter /service-areas. Die Regionsseite
  *  (/service-areas/county/<x>) hat zwei und zaehlt hier nicht mit. */
 const istOrtsseite = (p) => /^\/service-areas\/[^/]+$/.test(p);

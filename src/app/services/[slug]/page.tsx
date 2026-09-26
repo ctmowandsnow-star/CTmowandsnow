@@ -3,19 +3,37 @@ import Image from 'next/image';
 import { Verweis as Link } from '@/components/ui/Verweis';
 import { notFound } from 'next/navigation';
 import { ArrowRight, Check, MapPin } from 'lucide-react';
-import { SERVICES, serviceBySlug } from '@/config/services';
+import { SERVICES, serviceBySlug, type Service } from '@/config/services';
 import { TOWNS, REGION, STATE_CODE } from '@/config/towns';
 import { PAIRS } from '@/config/gallery';
 import { Reveal } from '@/components/ui/Reveal';
 import { Faq } from '@/components/ui/Faq';
 import { Cta } from '@/components/site/Cta';
 import { Crumbs } from '@/components/site/Crumbs';
-import { BreadcrumbLD, FaqLD, ServiceLD } from '@/components/seo/JsonLd';
-import { canonical, ROBOTS } from '@/lib/seo';
+import { BreadcrumbLD, FaqLD, SeiteLD, ServiceLD } from '@/components/seo/JsonLd';
+import { beschreibung, canonical, ORTE_KURZ, ROBOTS, titel } from '@/lib/seo';
 import { bild } from '@/lib/pfad';
 
 export function generateStaticParams() {
   return SERVICES.map((s) => ({ slug: s.slug }));
+}
+
+/**
+ * Die Kurzbeschreibung ist der erste Satz der zitierbaren Antwort - keine
+ * zweite Textquelle, die vom sichtbaren Inhalt abweichen kann. Metadaten und
+ * Seitenknoten lesen beide hier.
+ */
+function texte(s: Service) {
+  const ersterSatz = `${s.answer.split('. ')[0]}.`;
+  return {
+    titel: s.name,
+    beschreibung: beschreibung(
+      `${ersterSatz} Serving ${TOWNS.map((t) => t.name).slice(0, 4).join(', ')} and surrounding areas in ${REGION}.`,
+      `${ersterSatz} Serving ${ORTE_KURZ} and nearby towns.`,
+      `${ersterSatz} Free estimates.`,
+      `${s.summary} Free estimates across ${REGION}, ${STATE_CODE}.`,
+    ),
+  };
 }
 
 export async function generateMetadata(
@@ -24,11 +42,10 @@ export async function generateMetadata(
   const { slug } = await params;
   const s = serviceBySlug.get(slug);
   if (!s) return {};
+  const t = texte(s);
   return {
-    title: s.name,
-    // Die Kurzbeschreibung ist der erste Satz der zitierbaren Antwort - keine
-    // zweite Textquelle, die vom sichtbaren Inhalt abweichen kann.
-    description: `${s.answer.split('. ')[0]}. Serving ${TOWNS.map((t) => t.name).slice(0, 4).join(', ')} and surrounding areas in ${REGION}.`,
+    title: titel(t.titel),
+    description: t.beschreibung,
     robots: ROBOTS,
     alternates: canonical(`/services/${s.slug}`),
   };
@@ -43,8 +60,11 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
   // Passende Vorher/Nachher-Beispiele: nur die der gleichen Saison.
   const examples = PAIRS.filter((p) => p.season === s.season).slice(0, 2);
 
+  const text = texte(s);
+
   return (
     <>
+      <SeiteLD pfad={`/services/${s.slug}`} name={text.titel} beschreibung={text.beschreibung} />
       <ServiceLD service={s} />
       <FaqLD id={s.slug} faq={s.faq} />
       <BreadcrumbLD

@@ -19,7 +19,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const WURZEL = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PRUEFSTAENDE = ['tailwind-klassen.mjs', 'durchstich.mjs', 'links.mjs', 'doorway.mjs', 'behauptungen.mjs'];
+const PRUEFSTAENDE = ['tailwind-klassen.mjs', 'durchstich.mjs', 'links.mjs', 'doorway.mjs', 'behauptungen.mjs', 'geo.mjs'];
 
 // Unterpfad aus dem BAU lesen, nicht raten: ein mit NEXT_BASE_PATH=/ct
 // gebauter Stand antwortet nur unter /ct.

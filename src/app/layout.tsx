@@ -6,19 +6,21 @@ import { Footer } from '@/components/site/Footer';
 import { DraftBanner } from '@/components/site/DraftBanner';
 import { BusinessLD, WebSiteLD } from '@/components/seo/JsonLd';
 import { BUSINESS } from '@/config/business';
-import { TOWNS, REGION, STATE } from '@/config/towns';
-import { ROBOTS } from '@/lib/seo';
+import { AUTOREN, ROBOTS, START_BESCHREIBUNG, START_TITEL } from '@/lib/seo';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BUSINESS.url),
+  // Titel und Beschreibung der Startseite stehen in lib/seo.ts, weil der
+  // Seitenknoten (SeiteLD) dieselben Texte braucht. Die alte Fassung hatte
+  // 70 Zeichen Titel und 222 Zeichen Beschreibung - beides wurde abgeschnitten.
   title: {
-    default: `${BUSINESS.name} — ${BUSINESS.tagline}`,
+    default: START_TITEL,
     template: `%s — ${BUSINESS.name}`,
   },
-  description:
-    `Lawn mowing, mulch, cleanups and bush work from spring through fall. Driveway plowing, walkways and `
-    + `ice control all winter. Serving ${TOWNS.map((t) => t.name).slice(0, 4).join(', ')} and surrounding `
-    + `areas in ${REGION}.`,
+  description: START_BESCHREIBUNG,
+  authors: AUTOREN,
+  creator: BUSINESS.name,
+  publisher: BUSINESS.name,
   robots: ROBOTS,
   alternates: { canonical: '/' },
   openGraph: {

@@ -4,15 +4,22 @@ import { PAIRS, GREEN_SHOWCASE, SNOW_SHOWCASE } from '@/config/gallery';
 import { BeforeAfter } from '@/components/ui/BeforeAfter';
 import { Reveal } from '@/components/ui/Reveal';
 import { Cta } from '@/components/site/Cta';
-import { BreadcrumbLD } from '@/components/seo/JsonLd';
-import { canonical, ROBOTS } from '@/lib/seo';
+import { BreadcrumbLD, SeiteLD } from '@/components/seo/JsonLd';
+import { beschreibung, canonical, ROBOTS, titel } from '@/lib/seo';
 import { bild } from '@/lib/pfad';
 
-export const metadata: Metadata = {
-  title: 'Our Work',
-  description:
-    'Before and after photos from properties we maintain — mowing, mulch and bed work in the green season, '
+const TITEL = 'Before & After Photos of Our Work';
+const BESCHREIBUNG = beschreibung(
+  'Before and after photos from properties we maintain — mowing, mulch and bed work in the green season, '
     + 'plowed driveways and cleared walkways in winter. Every photo is our own.',
+  'Before and after photos from properties we maintain: lawns, mulch and beds in the green season, plowed '
+    + 'driveways and walkways in winter.',
+);
+
+export const metadata: Metadata = {
+  // Vorher nur "Our Work" (22 Zeichen mit Marke).
+  title: titel(TITEL),
+  description: BESCHREIBUNG,
   robots: ROBOTS,
   alternates: canonical('/gallery'),
 };
@@ -43,6 +50,7 @@ function Tiles({ items }: { items: typeof GREEN_SHOWCASE }) {
 export default function GalleryPage() {
   return (
     <>
+      <SeiteLD typ="ImageGallery" pfad="/gallery" name={TITEL} beschreibung={BESCHREIBUNG} />
       <BreadcrumbLD trail={[{ name: 'Home', path: '/' }, { name: 'Our Work', path: '/gallery' }]} />
 
       <header className="wrap pb-10 pt-36">

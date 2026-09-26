@@ -2,17 +2,23 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { Reveal } from '@/components/ui/Reveal';
 import { Cta } from '@/components/site/Cta';
-import { BreadcrumbLD } from '@/components/seo/JsonLd';
-import { BUSINESS } from '@/config/business';
+import { BreadcrumbLD, SeiteLD } from '@/components/seo/JsonLd';
+import { BUSINESS, HAT_INHABER } from '@/config/business';
 import { TOWN_COUNT, COUNTY, REGION, STATE, UMLAND_HINWEIS } from '@/config/towns';
-import { canonical, ROBOTS } from '@/lib/seo';
+import { beschreibung, canonical, ROBOTS } from '@/lib/seo';
 import { bild } from '@/lib/pfad';
 
-export const metadata: Metadata = {
-  title: 'About',
-  description:
-    `${BUSINESS.name} is a local lawn care and snow removal business working ${COUNTY}, ${STATE}. `
+const TITEL = `About ${BUSINESS.name} — Lawn Care & Snow Removal`;
+const BESCHREIBUNG = beschreibung(
+  `${BUSINESS.name} is a local lawn care and snow removal business working ${COUNTY}, ${STATE}. `
     + `Same crew year-round, a tight route, and free estimates.`,
+  `${BUSINESS.name}: local lawn care and snow removal in ${COUNTY}, ${STATE}. Same crew year-round, free estimates.`,
+);
+
+export const metadata: Metadata = {
+  // Vorher nur "About" (19 Zeichen mit Marke) - ein Titel, der nicht sagt, worum es geht.
+  title: { absolute: TITEL },
+  description: BESCHREIBUNG,
   robots: ROBOTS,
   alternates: canonical('/about'),
 };
@@ -20,6 +26,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
+      <SeiteLD typ="AboutPage" pfad="/about" name={TITEL} beschreibung={BESCHREIBUNG} />
       <BreadcrumbLD trail={[{ name: 'Home', path: '/' }, { name: 'About', path: '/about' }]} />
 
       <header className="wrap pb-10 pt-36">
@@ -34,6 +41,13 @@ export default function AboutPage() {
       <section className="wrap grid gap-12 pb-16 lg:grid-cols-[1.05fr_.95fr]">
         <Reveal>
           <div className="space-y-5 text-[15px] leading-relaxed text-bark-200">
+            {/* Wer dahinter steht - erscheint von selbst, sobald in business.ts ein
+                echter Inhabername steht (dazu Person im Schema). */}
+            {HAT_INHABER && (
+              <p>
+                {BUSINESS.name} is owned and run by {BUSINESS.ownerName}.
+              </p>
+            )}
             <p>
               {BUSINESS.name} maintains residential properties across {COUNTY}. In the
               green season that means mowing, beds, mulch, trimming and cleanups. Once the ground freezes it

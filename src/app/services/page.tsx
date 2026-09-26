@@ -6,15 +6,21 @@ import { GREEN_SERVICES, SNOW_SERVICES, type Service } from '@/config/services';
 import { TOWNS, TOWN_COUNT, REGION } from '@/config/towns';
 import { Reveal } from '@/components/ui/Reveal';
 import { Cta } from '@/components/site/Cta';
-import { BreadcrumbLD } from '@/components/seo/JsonLd';
-import { canonical, ROBOTS } from '@/lib/seo';
+import { BreadcrumbLD, SeiteLD } from '@/components/seo/JsonLd';
+import { beschreibung, canonical, ROBOTS, titel } from '@/lib/seo';
 import { bild } from '@/lib/pfad';
 
-export const metadata: Metadata = {
-  title: 'Services — Lawn Care & Snow Removal',
-  description:
-    `Everything we do, in both seasons: mowing, mulch and bed edging, spring and fall cleanups, shrub work, `
+const TITEL = 'Lawn Care & Snow Removal Services';
+const BESCHREIBUNG = beschreibung(
+  `Everything we do, in both seasons: mowing, mulch and bed edging, spring and fall cleanups, shrub work, `
     + `driveway plowing, walkway clearing and ice control across ${REGION}.`,
+  `Mowing, mulch, cleanups and shrub work spring through fall; driveway plowing, walkways and ice control `
+    + `all winter, across ${REGION}.`,
+);
+
+export const metadata: Metadata = {
+  title: titel(TITEL),
+  description: BESCHREIBUNG,
   robots: ROBOTS,
   alternates: canonical('/services'),
 };
@@ -72,6 +78,7 @@ function Block({ title, note, list, icon: Icon }: {
 export default function ServicesPage() {
   return (
     <>
+      <SeiteLD typ="CollectionPage" pfad="/services" name={TITEL} beschreibung={BESCHREIBUNG} />
       <BreadcrumbLD trail={[{ name: 'Home', path: '/' }, { name: 'Services', path: '/services' }]} />
       <header className="wrap pb-6 pt-36">
         <Reveal>

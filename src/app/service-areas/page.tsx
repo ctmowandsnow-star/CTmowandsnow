@@ -6,15 +6,22 @@ import { TOWNS, COUNTY, REGION, STATE, UMLAND_HINWEIS, neighborsOf } from '@/con
 import { Reveal } from '@/components/ui/Reveal';
 import { Cta } from '@/components/site/Cta';
 import { Crumbs } from '@/components/site/Crumbs';
-import { BreadcrumbLD } from '@/components/seo/JsonLd';
-import { canonical, ROBOTS } from '@/lib/seo';
+import { BreadcrumbLD, SeiteLD } from '@/components/seo/JsonLd';
+import { beschreibung, canonical, ROBOTS, titel } from '@/lib/seo';
 import { bild } from '@/lib/pfad';
 
-export const metadata: Metadata = {
-  title: 'Service Area',
-  description:
-    `The towns we cover in ${COUNTY}, ${STATE} — core route and nearby. Lawn care through the green season, `
+const TITEL = 'Service Area — Towns We Cover in Central CT';
+const BESCHREIBUNG = beschreibung(
+  `The towns we cover in ${COUNTY}, ${STATE} — core route and nearby. Lawn care through the green season, `
     + `snow plowing and ice management in winter.`,
+  `The towns we cover in ${COUNTY}, ${STATE}: lawn care through the green season, snow plowing and ice `
+    + `control in winter.`,
+);
+
+export const metadata: Metadata = {
+  // Vorher nur "Service Area" - ohne Ort und ohne Leistung.
+  title: titel(TITEL),
+  description: BESCHREIBUNG,
   robots: ROBOTS,
   alternates: canonical('/service-areas'),
 };
@@ -22,6 +29,7 @@ export const metadata: Metadata = {
 export default function ServiceAreasPage() {
   return (
     <>
+      <SeiteLD typ="CollectionPage" pfad="/service-areas" name={TITEL} beschreibung={BESCHREIBUNG} />
       <BreadcrumbLD trail={[{ name: 'Home', path: '/' }, { name: 'Service Area', path: '/service-areas' }]} />
 
       <header className="relative isolate overflow-hidden pb-14 pt-36">

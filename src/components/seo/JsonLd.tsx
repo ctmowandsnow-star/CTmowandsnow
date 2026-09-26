@@ -1,6 +1,7 @@
-import { BUSINESS, HAT_ADRESSE } from '@/config/business';
+import { BUSINESS, HAT_ADRESSE, HAT_INHABER } from '@/config/business';
 import { SERVICES, type Service } from '@/config/services';
-import { TOWNS, STATE, type Town } from '@/config/towns';
+import { TOWNS, STATE, STATE_CODE, COUNTY, REGION, type Town } from '@/config/towns';
+import { aufzaehlung } from '@/lib/seo';
 
 /**
  * Strukturierte Daten - der Teil, den ein KI-System zuerst liest.
@@ -42,15 +43,45 @@ function areaServed(towns: Town[] = TOWNS) {
 }
 
 export const BUSINESS_ID = `${BUSINESS.url}/#business`;
+export const WEBSITE_ID = `${BUSINESS.url}/#website`;
+
+/**
+ * Ein Typ, den es in schema.org WIRKLICH gibt.
+ *
+ * Bis 26.09.2026 stand hier 'LandscapingBusiness'. Diesen Typ kennt schema.org
+ * nicht (die Untertypen von LocalBusiness enden bei HomeAndConstructionBusiness
+ * mit Electrician, Plumber, RoofingContractor usw. - Landschaftsbau ist nicht
+ * dabei). Ein unbekannter Typ ist fuer Validatoren und Suchmaschinen kein
+ * Unternehmen, sondern ein unbekanntes Ding: der GEO-Check von
+ * ai-geotracking.com fand deshalb "kein maschinenlesbares Firmenprofil"
+ * (Identitaet 0 von 15), obwohl der Datensatz auf jeder Seite stand.
+ * Was der Betrieb genau tut, sagen knowsAbout und der Leistungskatalog.
+ * pruefungen/geo.mjs laesst nur Typen aus der schema.org-Liste durch.
+ */
+export const BUSINESS_TYPE = 'HomeAndConstructionBusiness';
 
 export function BusinessLD() {
   const data: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    '@type': 'LandscapingBusiness',
+    '@type': BUSINESS_TYPE,
     '@id': BUSINESS_ID,
     name: BUSINESS.name,
     description: BUSINESS.tagline,
+    /*
+     * In Connecticut gibt es einen zweiten Betrieb mit fast gleichem Namen -
+     * anderer Ort, andere Domain, eigenes Google-Profil. Ein Sprachmodell, das
+     * nur den Namen sieht, mischt die beiden: fremde Telefonnummer, fremde
+     * Bewertungen. Dieser Satz sagt einer Maschine, woran sie DIESEN Betrieb
+     * erkennt (Orte + Domain), ohne den anderen zu nennen.
+     */
+    disambiguatingDescription:
+      `Residential lawn care and snow removal in ${REGION} (${COUNTY}, ${STATE_CODE}), serving `
+      + `${aufzaehlung(TOWNS.map((t) => t.name))}. Website: ${BUSINESS.url.replace(/^https?:\/\//, '')}.`,
+    slogan: BUSINESS.claim,
     url: BUSINESS.url,
+    // Ein eigenes Arbeitsfoto - dasselbe, das die Seite als Vorschaubild nutzt.
+    image: `${BUSINESS.url}/images/property-full-after.jpg`,
+    mainEntityOfPage: { '@id': WEBSITE_ID },
     areaServed: areaServed(),
     knowsAbout: [
       'lawn mowing', 'mulch installation', 'bed edging', 'spring cleanup',
@@ -75,6 +106,28 @@ export function BusinessLD() {
   // Kontaktweg nur, wenn es ihn wirklich gibt.
   if (BUSINESS.contact.phone) data.telephone = BUSINESS.contact.phone;
   if (BUSINESS.contact.email) data.email = BUSINESS.contact.email;
+  if (BUSINESS.contact.phone || BUSINESS.contact.email) {
+    data.contactPoint = {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      ...(BUSINESS.contact.phone ? { telephone: BUSINESS.contact.phone } : {}),
+      ...(BUSINESS.contact.email ? { email: BUSINESS.contact.email } : {}),
+    };
+  }
+
+  // Wer dahinter steht - erst, wenn ein echter Name eingetragen ist. KI-Systeme
+  // ziehen Quellen mit erkennbarer Person vor; ein Platzhaltername waere eine
+  // Falschangabe. "employee" + jobTitle, weil nur die Inhaberschaft belegt
+  // sein wird, nicht die Gruendung.
+  if (HAT_INHABER) {
+    data.employee = {
+      '@type': 'Person',
+      '@id': `${BUSINESS.url}/#owner`,
+      name: BUSINESS.ownerName,
+      jobTitle: 'Owner',
+      worksFor: { '@id': BUSINESS_ID },
+    };
+  }
 
   const profile = Object.values(BUSINESS.profiles).filter(Boolean);
   if (profile.length) data.sameAs = profile;
@@ -114,7 +167,7 @@ export function WebSiteLD() {
       data={{
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        '@id': `${BUSINESS.url}/#website`,
+        '@id': WEBSITE_ID,
         name: BUSINESS.name,
         alternateName: BUSINESS.claim,
         description: BUSINESS.tagline,
@@ -200,10 +253,13 @@ export function ServiceTownPageLD({ service, town }: { service: Service; town: T
       data={{
         '@context': 'https://schema.org',
         '@type': 'WebPage',
+        '@id': `${BUSINESS.url}/services/${service.slug}/${town.slug}#webpage`,
         name: `${service.name} in ${town.name}, ${town.stateCode}`,
         url: `${BUSINESS.url}/services/${service.slug}/${town.slug}`,
+        inLanguage: 'en-US',
         about: { '@id': BUSINESS_ID },
-        isPartOf: { '@id': `${BUSINESS.url}/#website` },
+        isPartOf: { '@id': WEBSITE_ID },
+        ...HERKUNFT,
         primaryImageOfPage: { '@type': 'ImageObject', url: `${BUSINESS.url}/images/${service.image}.jpg` },
         contentLocation: {
           '@type': 'City',
@@ -226,10 +282,13 @@ export function TownPageLD({ town }: { town: Town }) {
       data={{
         '@context': 'https://schema.org',
         '@type': 'WebPage',
+        '@id': `${BUSINESS.url}/service-areas/${town.slug}#webpage`,
         name: `Lawn Care & Snow Removal in ${town.name}, ${town.stateCode}`,
         url: `${BUSINESS.url}/service-areas/${town.slug}`,
+        inLanguage: 'en-US',
         about: { '@id': BUSINESS_ID },
-        isPartOf: { '@id': `${BUSINESS.url}/#website` },
+        isPartOf: { '@id': WEBSITE_ID },
+        ...HERKUNFT,
         contentLocation: {
           '@type': 'City',
           name: town.name,
@@ -238,6 +297,49 @@ export function TownPageLD({ town }: { town: Town }) {
             { '@type': 'State', name: STATE },
           ],
         },
+      }}
+    />
+  );
+}
+
+/**
+ * Wer die Seite verantwortet - fuer jeden Seitenknoten dieselbe Angabe.
+ * KI-Systeme stuetzen sich lieber auf Quellen mit erkennbarer Herkunft; ohne
+ * author/publisher ist eine Seite fuer sie eine Behauptung ohne Absender.
+ */
+const HERKUNFT = {
+  author: { '@id': BUSINESS_ID },
+  publisher: { '@id': BUSINESS_ID },
+};
+
+export type SeitenTyp = 'WebPage' | 'AboutPage' | 'ContactPage' | 'CollectionPage' | 'ImageGallery';
+
+/**
+ * Seitenknoten fuer alle Seiten, die keinen eigenen haben. Bis 26.09.2026
+ * hatten nur die 77 Orts- und Kombiseiten einen - Startseite, Leistungen,
+ * Ueber uns, Kontakt und Galerie nicht. Name und Beschreibung kommen aus
+ * DENSELBEN Konstanten wie die Metadaten der Seite.
+ */
+export function SeiteLD({ typ = 'WebPage', pfad, name, beschreibung }: {
+  typ?: SeitenTyp; pfad: string; name: string; beschreibung: string;
+}) {
+  const url = pfad === '/' ? BUSINESS.url : `${BUSINESS.url}${pfad}`;
+  const hauptsache = typ === 'AboutPage' || typ === 'ContactPage' ? { mainEntity: { '@id': BUSINESS_ID } } : {};
+  return (
+    <Script
+      id={`seite-ld-${pfad === '/' ? 'start' : pfad.slice(1).replace(/\//g, '-')}`}
+      data={{
+        '@context': 'https://schema.org',
+        '@type': typ,
+        '@id': `${pfad === '/' ? `${BUSINESS.url}/` : url}#webpage`,
+        url,
+        name,
+        description: beschreibung,
+        inLanguage: 'en-US',
+        isPartOf: { '@id': WEBSITE_ID },
+        about: { '@id': BUSINESS_ID },
+        ...hauptsache,
+        ...HERKUNFT,
       }}
     />
   );

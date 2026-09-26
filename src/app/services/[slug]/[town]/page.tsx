@@ -11,7 +11,7 @@ import { Faq } from '@/components/ui/Faq';
 import { Crumbs } from '@/components/site/Crumbs';
 import { Cta } from '@/components/site/Cta';
 import { BreadcrumbLD, FaqLD, ServiceLD, ServiceTownPageLD } from '@/components/seo/JsonLd';
-import { canonical, ROBOTS } from '@/lib/seo';
+import { beschreibung, canonical, ROBOTS, titel } from '@/lib/seo';
 import { bild } from '@/lib/pfad';
 
 /**
@@ -55,16 +55,23 @@ export async function generateMetadata(
   const s = serviceBySlug.get(slug);
   const t = townBySlug.get(town);
   if (!s || !t) return {};
-  const titel = `${s.name} in ${t.name}, ${t.stateCode}`;
+  const kern = `${s.name} in ${t.name}, ${t.stateCode}`;
+  const merkmal = t.merkmale[s.relevant[0]];
   return {
-    title: { absolute: `${titel} — ${BUSINESS.name}` },
-    description:
-      `${s.summary} ${t.merkmale[s.relevant[0]]} Free estimates in ${t.name} and across ${REGION}.`
-        .slice(0, 300),
+    // Mit Firmenname nur, wenn es in 60 Zeichen passt ("Lawn Mowing, Edging &
+    // Trimming in New Britain, CT" hat allein schon 51) - Leistung und Ort
+    // sind hier das, wonach gesucht wird, nicht die Marke.
+    title: titel(kern),
+    description: beschreibung(
+      `${s.summary} ${merkmal} Free estimates in ${t.name} and across ${REGION}.`,
+      `${s.summary} ${merkmal} Free estimates in ${t.name}.`,
+      `${s.summary} ${merkmal}`,
+      `${kern}: ${s.summary} Free estimates in ${t.name} and across ${REGION}.`,
+    ),
     robots: ROBOTS,
     alternates: canonical(`/services/${s.slug}/${t.slug}`),
     openGraph: {
-      title: titel,
+      title: kern,
       description: s.answer.slice(0, 200),
       url: `${BUSINESS.url}/services/${s.slug}/${t.slug}`,
       images: [{ url: `/images/${s.image}.jpg`, alt: s.imageAlt }],

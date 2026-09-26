@@ -7,15 +7,21 @@ import { TOWNS, REGION } from '@/config/towns';
 import { Reveal } from '@/components/ui/Reveal';
 import { Crumbs } from '@/components/site/Crumbs';
 import { Cta } from '@/components/site/Cta';
-import { BreadcrumbLD } from '@/components/seo/JsonLd';
-import { canonical, ROBOTS } from '@/lib/seo';
+import { BreadcrumbLD, SeiteLD } from '@/components/seo/JsonLd';
+import { beschreibung, canonical, ROBOTS, titel } from '@/lib/seo';
 import { bild } from '@/lib/pfad';
 
-export const metadata: Metadata = {
-  title: 'Ways to Work With Us',
-  description:
-    `Regular maintenance on a fixed day, a one-time cleanup, or snow after a storm — three ways to work `
+const TITEL = 'Ways to Work With Us';
+const BESCHREIBUNG = beschreibung(
+  `Regular maintenance on a fixed day, a one-time cleanup, or snow after a storm — three ways to work `
     + `with us across ${REGION}. Free estimates either way.`,
+  `Regular maintenance on a fixed day, a one-time cleanup, or snow after a storm — three ways to work `
+    + `with us across ${REGION}.`,
+);
+
+export const metadata: Metadata = {
+  title: titel(TITEL),
+  description: BESCHREIBUNG,
   robots: ROBOTS,
   alternates: canonical('/how-we-work'),
 };
@@ -24,6 +30,7 @@ export default function ArbeitsweisenSeite() {
   const spur = [{ name: 'Home', path: '/' }, { name: 'Ways to Work With Us', path: '/how-we-work' }];
   return (
     <>
+      <SeiteLD typ="CollectionPage" pfad="/how-we-work" name={TITEL} beschreibung={BESCHREIBUNG} />
       <BreadcrumbLD trail={spur} />
       <header className="wrap pb-8 pt-32">
         <Crumbs trail={spur} />

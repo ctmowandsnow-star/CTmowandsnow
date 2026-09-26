@@ -1,6 +1,6 @@
 import { Verweis as Link } from '@/components/ui/Verweis';
 import { Mail, MapPin, Phone } from 'lucide-react';
-import { BUSINESS } from '@/config/business';
+import { BUSINESS, ZEITEN_SICHTBAR } from '@/config/business';
 import { GREEN_SERVICES, SNOW_SERVICES } from '@/config/services';
 import { ARBEITSWEISEN } from '@/config/arbeitsweisen';
 import { TOWNS, REGION, STATE_CODE, TOWN_COUNT } from '@/config/towns';
@@ -94,7 +94,7 @@ export function Footer() {
       <div className="border-t border-white/5">
         <div className="wrap flex flex-col gap-2 py-5 text-xs text-bark-400 sm:flex-row sm:items-center sm:justify-between">
           <p>© {jahr} {BUSINESS.name}. All rights reserved.</p>
-          <p>{BUSINESS.hours.regular} · {BUSINESS.hours.stormNote}</p>
+          {ZEITEN_SICHTBAR && <p>{BUSINESS.hours.regular} · {BUSINESS.hours.stormNote}</p>}
         </div>
       </div>
     </footer>
