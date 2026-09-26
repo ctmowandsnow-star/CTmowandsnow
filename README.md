@@ -3,6 +3,8 @@
 Lawn care and snow removal in Central Connecticut. Built with Next.js, hosted
 on Vercel.
 
+Preview (draft, not indexed): https://c-tmowandsnow.vercel.app
+
 ## Change something with Claude
 
 1. Open [claude.ai/code](https://claude.ai/code) — or the **Code** tab in the
