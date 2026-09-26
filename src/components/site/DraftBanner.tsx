@@ -15,7 +15,7 @@ import { BUSINESS, OFFENE_FELDER } from '@/config/business';
  * Seitenabstand gemeinsam benutzt.
  */
 export function DraftBanner() {
-  if (!BUSINESS.istEntwurf) return null;
+  if (!BUSINESS.istEntwurf || !BUSINESS.zeigeEntwurfsband) return null;
   return (
     <div
       className="fixed inset-x-0 top-0 z-[70] flex h-[var(--draft-h)] items-center justify-center gap-2

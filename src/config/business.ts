@@ -72,6 +72,13 @@ export const BUSINESS = {
    * Domain - deshalb bleibt der Schalter vorerst an.
    */
   istEntwurf: true,
+
+  /**
+   * Sichtbares Entwurfsband oben. Getrennt von istEntwurf: Niclas wollte das
+   * Band am 26.09.2026 weg, obwohl Telefon/Mail noch fehlen. noindex und die
+   * Schema-Sperren haengen weiter an istEntwurf.
+   */
+  zeigeEntwurfsband: false,
 } as const;
 
 /** Felder, die zwingend vom Kunden kommen muessen, bevor die Seite live geht. */

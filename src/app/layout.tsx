@@ -56,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     // Die Bandhoehe kommt aus derselben Quelle wie das Band selbst -
     // keine zweite Stelle, die vergessen werden kann.
-    <html lang="en-US" style={{ '--draft-h': BUSINESS.istEntwurf ? '36px' : '0px' } as React.CSSProperties}>
+    <html lang="en-US" style={{ '--draft-h': BUSINESS.istEntwurf && BUSINESS.zeigeEntwurfsband ? '36px' : '0px' } as React.CSSProperties}>
       <body>
         <BusinessLD />
         <WebSiteLD />
