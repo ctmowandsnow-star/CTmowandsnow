@@ -27,8 +27,8 @@ export const BUSINESS = {
   /** Sein Claim - woertlich uebernommen. */
   claim: 'One Company. All Seasons.',
 
-  /** PLATZHALTER - echte Domain fehlt. Wird fuer canonical + Schema gebraucht. */
-  url: 'https://example-ctmowandsnow.com',
+  /** Domain des Betriebs (bei Wix registriert, zeigt per A/CNAME auf Vercel). Stand 26.09.2026. */
+  url: 'https://ctmowandsnowllc.com',
 
   contact: {
     /** PLATZHALTER. Ein Telefonlink mit falscher Nummer ist schlimmer als keiner. */
