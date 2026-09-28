@@ -10,23 +10,32 @@ import { TOWNS, REGION, STATE_CODE } from '@/config/towns';
 import { BUSINESS } from '@/config/business';
 import { bild, video } from '@/lib/pfad';
 
+/**
+ * Ueberschrift und Text hat der Inhaber selbst vorgegeben (Mail an Niclas,
+ * 26.09.2026: "for number one put this ... for number two put this").
+ * Sie gelten fuer BEIDE Saisons - sonst waere seine Ueberschrift ab Dezember,
+ * wenn die Seite im Winter startet, gar nicht mehr zu sehen. Die Zeile spiegelt
+ * den Claim in seinem Logo ("Professional Care. Year-Round.").
+ * Der Saison-Umschalter wechselt weiter Kulisse, Zeile darueber und Knopf.
+ */
+const KOPF = {
+  head: 'Professional care.',
+  headAccent: 'Year-round.',
+  sub:
+    'Reliable property care throughout every season. From weekly lawn maintenance and landscape '
+    + 'cleanups to mulching, trimming, and winter snow services, we keep your property looking its '
+    + 'best year-round.',
+} as const;
+
 const COPY = {
   green: {
     eyebrow: 'Spring · Summer · Fall',
-    head: 'A lawn that looks',
-    headAccent: 'looked after',
-    sub:
-      'Weekly or biweekly mowing on a fixed day, beds edged and mulched, cleanups in spring and fall. '
-      + 'The same crew on your property every week, so nothing gets learned twice.',
+    ...KOPF,
     cta: 'Get a lawn quote',
   },
   snow: {
     eyebrow: 'December · January · February · March',
-    head: 'Plowed before you',
-    headAccent: 'need to leave',
-    sub:
-      'Driveways cleared during the storm and again after it stops. Walkways and entrances done by hand, '
-      + 'and treated so the next thaw does not lock everything back up.',
+    ...KOPF,
     cta: 'Get on the snow route',
   },
 } as const;

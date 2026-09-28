@@ -1,3 +1,5 @@
+import Image from 'next/image';
+import { bild } from '@/lib/pfad';
 import { Verweis as Link } from '@/components/ui/Verweis';
 import { Mail, MapPin, Phone } from 'lucide-react';
 import { BUSINESS, ZEITEN_SICHTBAR } from '@/config/business';
@@ -11,7 +13,10 @@ export function Footer() {
     <footer className="border-t border-white/10 bg-black/40">
       <div className="wrap grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-5">
         <div>
-          <p className="font-display text-xl font-semibold text-white">{BUSINESS.name}</p>
+          <p className="flex items-center gap-3 font-display text-xl font-semibold text-white">
+            <Image src={bild('logo-emblem.png')} alt="" width={44} height={44} className="h-11 w-11" />
+            {BUSINESS.name}
+          </p>
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-bark-300">{BUSINESS.tagline}</p>
           <div className="mt-5 space-y-2 text-sm text-bark-300">
             {BUSINESS.contact.phone && (

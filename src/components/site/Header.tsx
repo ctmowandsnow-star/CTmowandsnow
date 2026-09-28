@@ -2,6 +2,8 @@
 
 import { Verweis as Link } from '@/components/ui/Verweis';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { bild } from '@/lib/pfad';
 import { Menu, X, Phone, Snowflake, Leaf } from 'lucide-react';
 import { BUSINESS } from '@/config/business';
 import { useSeason } from '@/components/ui/SeasonProvider';
@@ -41,12 +43,18 @@ export function Header() {
     >
       <div className="wrap flex h-[72px] items-center justify-between gap-4">
         <Link href="/" className="group flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          <span
-            className="grid h-9 w-9 place-items-center rounded-xl text-white transition-transform duration-500 group-hover:rotate-12"
-            style={{ backgroundColor: 'rgb(var(--accent))' }}
-          >
-            {season === 'snow' ? <Snowflake size={18} /> : <Leaf size={18} />}
-          </span>
+          {/* Sein Logo (Mail 26.09.2026). Nur das runde Emblem: die Schrift im
+              Logo ist dunkel und waere auf der dunklen Kopfzeile unsichtbar -
+              der Name steht daneben als Text. Gras und Schneeflocke stecken
+              beide im Emblem, deshalb kein Saisonwechsel mehr noetig. */}
+          <Image
+            src={bild('logo-emblem.png')}
+            alt=""
+            width={40}
+            height={40}
+            priority
+            className="h-10 w-10 transition-transform duration-500 group-hover:rotate-12"
+          />
           <span className="font-display text-lg font-semibold tracking-tight text-white">
             <span className="sm:hidden">{BUSINESS.shortName}</span>
             <span className="hidden sm:inline">{BUSINESS.name}</span>

@@ -81,6 +81,8 @@ export function BusinessLD() {
     url: BUSINESS.url,
     // Ein eigenes Arbeitsfoto - dasselbe, das die Seite als Vorschaubild nutzt.
     image: `${BUSINESS.url}/images/property-full-after.jpg`,
+    // Sein eigenes Logo (Mail 26.09.2026), vollstaendig mit Schriftzug auf Weiss.
+    logo: `${BUSINESS.url}/images/logo.png`,
     mainEntityOfPage: { '@id': WEBSITE_ID },
     areaServed: areaServed(),
     knowsAbout: [
